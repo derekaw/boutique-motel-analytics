@@ -5,14 +5,14 @@
       "type": "King Studio",
       "nights": 240,
       "occ": 65.8,
-      "adr": 185.81,
-      "revpar": 122.17,
-      "revenue": 44594,
+      "adr": 168.55,
+      "revpar": 110.83,
+      "revenue": 40453,
       "cost": 28523,
-      "profit": 16071,
-      "margin": 36.0,
+      "profit": 11930,
+      "margin": 29.5,
       "cost_per_night": 118.85,
-      "margin_per_night": 66.96,
+      "margin_per_night": 49.71,
       "monthly_occ": [
         29,
         21,
@@ -39,7 +39,7 @@
         4186,
         3472,
         4251,
-        8546
+        4405
       ],
       "monthly_days": [
         31,
@@ -57,14 +57,14 @@
       ],
       "top_sources": [
         {
-          "name": "Booking.com VCC",
-          "revenue": 15020,
-          "nights": 60
+          "name": "Direct Booking",
+          "revenue": 12861,
+          "nights": 78
         },
         {
-          "name": "Direct Booking",
-          "revenue": 13406,
-          "nights": 78
+          "name": "Booking.com VCC",
+          "revenue": 11689,
+          "nights": 60
         },
         {
           "name": "Booking.com imported",
@@ -83,14 +83,14 @@
       "type": "King Studio",
       "nights": 251,
       "occ": 68.8,
-      "adr": 184.55,
-      "revpar": 126.91,
-      "revenue": 46321,
+      "adr": 167.49,
+      "revpar": 115.18,
+      "revenue": 42041,
       "cost": 28783,
-      "profit": 17537,
-      "margin": 37.9,
+      "profit": 13257,
+      "margin": 31.5,
       "cost_per_night": 114.68,
-      "margin_per_night": 69.87,
+      "margin_per_night": 52.82,
       "monthly_occ": [
         27,
         29,
@@ -117,7 +117,7 @@
         3769,
         4151,
         4796,
-        9345
+        5065
       ],
       "monthly_days": [
         31,
@@ -136,12 +136,12 @@
       "top_sources": [
         {
           "name": "Booking.com VCC",
-          "revenue": 18600,
+          "revenue": 15185,
           "nights": 79
         },
         {
           "name": "Direct Booking",
-          "revenue": 8915,
+          "revenue": 8370,
           "nights": 54
         },
         {
@@ -161,14 +161,14 @@
       "type": "Garden Studio",
       "nights": 206,
       "occ": 56.4,
-      "adr": 186.68,
-      "revpar": 105.36,
-      "revenue": 38457,
+      "adr": 171.21,
+      "revpar": 96.63,
+      "revenue": 35270,
       "cost": 27717,
-      "profit": 10740,
-      "margin": 27.9,
+      "profit": 7553,
+      "margin": 21.4,
       "cost_per_night": 134.55,
-      "margin_per_night": 52.14,
+      "margin_per_night": 36.67,
       "monthly_occ": [
         20,
         20,
@@ -195,7 +195,7 @@
         3580,
         4156,
         6297,
-        7131
+        3944
       ],
       "monthly_days": [
         31,
@@ -214,12 +214,12 @@
       "top_sources": [
         {
           "name": "Direct Booking",
-          "revenue": 16706,
+          "revenue": 14111,
           "nights": 90
         },
         {
           "name": "Booking.com VCC",
-          "revenue": 7860,
+          "revenue": 7639,
           "nights": 40
         },
         {
@@ -239,14 +239,14 @@
       "type": "Deluxe King Studio",
       "nights": 222,
       "occ": 60.8,
-      "adr": 198.83,
-      "revpar": 120.93,
-      "revenue": 44140,
+      "adr": 181.34,
+      "revpar": 110.29,
+      "revenue": 40257,
       "cost": 28096,
-      "profit": 16044,
-      "margin": 36.3,
+      "profit": 12161,
+      "margin": 30.2,
       "cost_per_night": 126.56,
-      "margin_per_night": 72.27,
+      "margin_per_night": 54.78,
       "monthly_occ": [
         27,
         18,
@@ -273,7 +273,7 @@
         4164,
         4791,
         4658,
-        9527
+        5644
       ],
       "monthly_days": [
         31,
@@ -292,17 +292,17 @@
       "top_sources": [
         {
           "name": "Booking.com VCC",
-          "revenue": 17816,
+          "revenue": 17088,
           "nights": 89
         },
         {
           "name": "Direct Booking",
-          "revenue": 13730,
+          "revenue": 12444,
           "nights": 75
         },
         {
           "name": "Website",
-          "revenue": 6276,
+          "revenue": 4406,
           "nights": 23
         },
         {
@@ -317,14 +317,14 @@
       "type": "Classic Studio",
       "nights": 248,
       "occ": 67.9,
-      "adr": 156.81,
-      "revpar": 106.54,
-      "revenue": 38888,
+      "adr": 142.19,
+      "revpar": 96.61,
+      "revenue": 35262,
       "cost": 28712,
-      "profit": 10176,
-      "margin": 26.2,
+      "profit": 6550,
+      "margin": 18.6,
       "cost_per_night": 115.78,
-      "margin_per_night": 41.03,
+      "margin_per_night": 26.41,
       "monthly_occ": [
         30,
         27,
@@ -351,7 +351,7 @@
         3365,
         3541,
         5108,
-        8084
+        4458
       ],
       "monthly_days": [
         31,
@@ -370,7 +370,7 @@
       "top_sources": [
         {
           "name": "Booking.com VCC",
-          "revenue": 19633,
+          "revenue": 17353,
           "nights": 111
         },
         {
@@ -385,7 +385,7 @@
         },
         {
           "name": "Direct Booking",
-          "revenue": 4122,
+          "revenue": 2777,
           "nights": 25
         }
       ]
@@ -395,14 +395,14 @@
       "type": "Spa Studio",
       "nights": 279,
       "occ": 76.4,
-      "adr": 181.94,
-      "revpar": 139.07,
-      "revenue": 50761,
+      "adr": 170.05,
+      "revpar": 129.98,
+      "revenue": 47444,
       "cost": 29447,
-      "profit": 21314,
-      "margin": 42.0,
+      "profit": 17997,
+      "margin": 37.9,
       "cost_per_night": 105.54,
-      "margin_per_night": 76.39,
+      "margin_per_night": 64.5,
       "monthly_occ": [
         26,
         25,
@@ -429,7 +429,7 @@
         4203,
         4900,
         5726,
-        8072
+        4754
       ],
       "monthly_days": [
         31,
@@ -448,17 +448,17 @@
       "top_sources": [
         {
           "name": "Booking.com VCC",
-          "revenue": 21773,
+          "revenue": 19463,
           "nights": 110
         },
         {
           "name": "Direct Booking",
-          "revenue": 13413,
+          "revenue": 12868,
           "nights": 77
         },
         {
           "name": "Website",
-          "revenue": 4983,
+          "revenue": 4521,
           "nights": 25
         },
         {
@@ -473,14 +473,14 @@
       "type": "Spa Studio",
       "nights": 221,
       "occ": 60.5,
-      "adr": 176.23,
-      "revpar": 106.7,
-      "revenue": 38946,
+      "adr": 161.87,
+      "revpar": 98.01,
+      "revenue": 35772,
       "cost": 28073,
-      "profit": 10873,
-      "margin": 27.9,
+      "profit": 7700,
+      "margin": 21.5,
       "cost_per_night": 127.03,
-      "margin_per_night": 49.2,
+      "margin_per_night": 34.84,
       "monthly_occ": [
         20,
         24,
@@ -507,7 +507,7 @@
         3464,
         3898,
         4703,
-        6784
+        3611
       ],
       "monthly_days": [
         31,
@@ -526,7 +526,7 @@
       "top_sources": [
         {
           "name": "Direct Booking",
-          "revenue": 13004,
+          "revenue": 11168,
           "nights": 72
         },
         {
@@ -536,7 +536,7 @@
         },
         {
           "name": "Website",
-          "revenue": 8068,
+          "revenue": 6730,
           "nights": 40
         },
         {
@@ -551,14 +551,14 @@
       "type": "Classic Studio",
       "nights": 260,
       "occ": 71.2,
-      "adr": 158.54,
-      "revpar": 112.94,
-      "revenue": 41221,
+      "adr": 144.8,
+      "revpar": 103.15,
+      "revenue": 37649,
       "cost": 28997,
-      "profit": 12225,
-      "margin": 29.7,
+      "profit": 8652,
+      "margin": 23.0,
       "cost_per_night": 111.53,
-      "margin_per_night": 47.02,
+      "margin_per_night": 33.28,
       "monthly_occ": [
         31,
         19,
@@ -585,7 +585,7 @@
         4052,
         4161,
         4318,
-        8146
+        4573
       ],
       "monthly_days": [
         31,
@@ -604,12 +604,12 @@
       "top_sources": [
         {
           "name": "Booking.com VCC",
-          "revenue": 18394,
+          "revenue": 16517,
           "nights": 109
         },
         {
           "name": "Direct Booking",
-          "revenue": 9110,
+          "revenue": 7514,
           "nights": 53
         },
         {
@@ -629,14 +629,14 @@
       "type": "Classic Studio",
       "nights": 283,
       "occ": 77.5,
-      "adr": 149.29,
-      "revpar": 115.75,
-      "revenue": 42248,
+      "adr": 139.0,
+      "revpar": 107.77,
+      "revenue": 39337,
       "cost": 29542,
-      "profit": 12706,
-      "margin": 30.1,
+      "profit": 9795,
+      "margin": 24.9,
       "cost_per_night": 104.39,
-      "margin_per_night": 44.9,
+      "margin_per_night": 34.61,
       "monthly_occ": [
         28,
         25,
@@ -663,7 +663,7 @@
         4160,
         3334,
         4671,
-        7471
+        4561
       ],
       "monthly_days": [
         31,
@@ -682,12 +682,12 @@
       "top_sources": [
         {
           "name": "Booking.com VCC",
-          "revenue": 19697,
+          "revenue": 17592,
           "nights": 123
         },
         {
           "name": "Direct Booking",
-          "revenue": 8698,
+          "revenue": 7992,
           "nights": 63
         },
         {
@@ -707,14 +707,14 @@
       "type": "Classic Studio",
       "nights": 265,
       "occ": 72.6,
-      "adr": 154.52,
-      "revpar": 112.19,
-      "revenue": 40949,
+      "adr": 140.85,
+      "revpar": 102.26,
+      "revenue": 37324,
       "cost": 29115,
-      "profit": 11834,
-      "margin": 28.9,
+      "profit": 8209,
+      "margin": 22.0,
       "cost_per_night": 109.87,
-      "margin_per_night": 44.66,
+      "margin_per_night": 30.98,
       "monthly_occ": [
         24,
         26,
@@ -741,7 +741,7 @@
         3370,
         3416,
         3943,
-        7587
+        3962
       ],
       "monthly_days": [
         31,
@@ -760,12 +760,12 @@
       "top_sources": [
         {
           "name": "Booking.com VCC",
-          "revenue": 16983,
+          "revenue": 14004,
           "nights": 100
         },
         {
           "name": "Direct Booking",
-          "revenue": 11082,
+          "revenue": 10536,
           "nights": 77
         },
         {
@@ -885,33 +885,33 @@
       "month": "2026-02",
       "nights": 222,
       "occ": 79.3,
-      "adr": 363.48,
-      "revpar": 288.19,
-      "revenue": 80693,
+      "adr": 202.59,
+      "revpar": 160.63,
+      "revenue": 44976,
       "bookings": 121
     }
   ],
   "sources": [
     {
       "name": "Booking.com VCC",
-      "revenue": 165801,
+      "revenue": 146554,
       "nights": 843,
       "bookings": 444,
-      "adr": 196.68
+      "adr": 173.85
     },
     {
       "name": "Direct Booking",
-      "revenue": 112186,
+      "revenue": 100641,
       "nights": 562,
       "bookings": 286,
-      "adr": 199.62
+      "adr": 179.08
     },
     {
       "name": "Website",
-      "revenue": 54766,
+      "revenue": 51096,
       "nights": 297,
       "bookings": 163,
-      "adr": 184.4
+      "adr": 172.04
     },
     {
       "name": "Booking.com imported",
@@ -922,10 +922,10 @@
     },
     {
       "name": "IDL - Independent Distributors Ltd",
-      "revenue": 7450,
+      "revenue": 7050,
       "nights": 18,
       "bookings": 18,
-      "adr": 413.89
+      "adr": 391.67
     },
     {
       "name": "Extranet imported",
@@ -935,18 +935,18 @@
       "adr": 138.06
     },
     {
-      "name": "Hallmark Group",
-      "revenue": 5320,
-      "nights": 32,
-      "bookings": 32,
-      "adr": 166.25
-    },
-    {
       "name": "M&H Communications",
       "revenue": 5120,
       "nights": 28,
       "bookings": 12,
       "adr": 182.86
+    },
+    {
+      "name": "Hallmark Group",
+      "revenue": 5000,
+      "nights": 32,
+      "bookings": 32,
+      "adr": 156.25
     },
     {
       "name": "Orbit World Travel Auckland",
@@ -1142,13 +1142,13 @@
   ],
   "totals": {
     "total_expenses": 287005.33,
-    "total_revenue": 426525,
-    "total_profit": 139520,
+    "total_revenue": 390809,
+    "total_profit": 103804,
     "total_occupied": 2475,
     "total_available": 3650,
     "overall_occ": 67.8,
-    "overall_adr": 172.33,
-    "overall_revpar": 116.86,
+    "overall_adr": 157.9,
+    "overall_revpar": 107.07,
     "cost_per_occ_night": 115.96,
     "variable_per_night": 23.7,
     "fixed_per_room_year": 22835.46

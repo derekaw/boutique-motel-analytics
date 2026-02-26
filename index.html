@@ -249,6 +249,11 @@
       </div>
     </div>
   </div>
+  <div class="card" style="margin-bottom:20px;">
+    <h3>Seasonal Cost Floor — Cost per Occupied Night by Month</h3>
+    <div style="font-size:12px; color:var(--muted); margin-bottom:14px;">Fixed costs ($19k/mo) spread across fewer nights in winter = higher floor. Red bars = months where average ADR was below the cost floor (losing money on average).</div>
+    <div class="chart-wrap-tall"><canvas id="chart-seasonal-cost"></canvas></div>
+  </div>
   <div class="card">
     <h3>Break-even Analysis by Room</h3>
     <table id="breakeven-table"></table>
@@ -416,6 +421,20 @@ function init() {
 
   document.getElementById('fixed-per-night-empty').textContent = (fixedTotal / (365*10)).toFixed(2);
   document.getElementById('var-per-night').textContent = T.variable_per_night;
+
+  // Seasonal cost floor chart
+  const fixedPerMonth = fixedTotal / 12;
+  const seasonalCosts = D.monthly.map(m => {
+    const totalCost = fixedPerMonth + (m.nights * T.variable_per_night);
+    return Math.round(totalCost / m.nights);
+  });
+  const seasonalColors = D.monthly.map((m, i) => seasonalCosts[i] > m.adr ? 'rgba(239,68,68,0.8)' : 'rgba(99,102,241,0.7)');
+  mkChart('chart-seasonal-cost', 'bar', months,
+    [
+      { label: 'Cost Floor ($/occ night)', data: seasonalCosts, backgroundColor: seasonalColors, borderRadius: 4 },
+      { label: 'ADR', data: D.monthly.map(m => m.adr), type: 'line', borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0)', pointRadius: 5, pointBackgroundColor: '#22c55e', borderWidth: 2, fill: false, tension: 0.2 }
+    ],
+    { legend: true, prefix: '$' });
 
   const bt = document.getElementById('breakeven-table');
   bt.innerHTML = '<tr><th>Room</th><th>Type</th><th>Occ %</th><th><span class="metric-tip" data-tip="ADR — Average Daily Rate&#10;Revenue ÷ occupied nights for this room.">ADR <span class=\'tip-icon\'>?</span></span></th><th>Cost/Night</th><th>Margin/Night</th><th>Annual Revenue</th><th>Annual Profit</th><th>Margin %</th></tr>' +

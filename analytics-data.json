@@ -923,9 +923,9 @@
     {
       "name": "IDL - Independent Distributors Ltd",
       "revenue": 7050,
-      "nights": 18,
-      "bookings": 18,
-      "adr": 391.67
+      "nights": 65,
+      "bookings": 11,
+      "adr": 108.46
     },
     {
       "name": "Extranet imported",
@@ -1144,12 +1144,12 @@
     "total_expenses": 287005.33,
     "total_revenue": 390809,
     "total_profit": 103804,
-    "total_occupied": 2475,
+    "total_occupied": 2522,
     "total_available": 3650,
-    "overall_occ": 67.8,
-    "overall_adr": 157.9,
+    "overall_occ": 69.1,
+    "overall_adr": 154.96,
     "overall_revpar": 107.07,
-    "cost_per_occ_night": 115.96,
+    "cost_per_occ_night": 113.8,
     "variable_per_night": 23.7,
     "fixed_per_room_year": 22835.46
   }

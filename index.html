@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boutique Motel — Room Analytics</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3248;
+    --text: #e8eaf0;
+    --muted: #8b90a8;
+    --green: #22c55e;
+    --red: #ef4444;
+    --blue: #3b82f6;
+    --amber: #f59e0b;
+    --purple: #a855f7;
+    --teal: #14b8a6;
+    --accent: #6366f1;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.5; }
+  .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 20px 32px; display: flex; justify-content: space-between; align-items: center; }
+  .header h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+  .header h1 span { color: var(--accent); }
+  .header .period { color: var(--muted); font-size: 13px; }
+  .nav { display: flex; gap: 4px; background: var(--surface); padding: 0 32px; border-bottom: 1px solid var(--border); }
+  .nav button { background: none; border: none; color: var(--muted); padding: 12px 16px; cursor: pointer; font-size: 13px; font-weight: 500; border-bottom: 2px solid transparent; transition: all 0.15s; }
+  .nav button.active, .nav button:hover { color: var(--text); border-bottom-color: var(--accent); }
+  .page { display: none; padding: 28px 32px; max-width: 1400px; margin: 0 auto; }
+  .page.active { display: block; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
+  .kpi .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+  .kpi .value { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+  .kpi .sub { color: var(--muted); font-size: 11px; margin-top: 4px; }
+  .kpi.green .value { color: var(--green); }
+  .kpi.blue .value { color: var(--blue); }
+  .kpi.amber .value { color: var(--amber); }
+  .kpi.purple .value { color: var(--purple); }
+  .kpi.teal .value { color: var(--teal); }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+  .card h3 { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 16px; }
+  .chart-wrap { position: relative; height: 220px; }
+  .chart-wrap-tall { position: relative; height: 300px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 8px 10px; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; border-bottom: 1px solid var(--border); font-weight: 500; }
+  td { padding: 9px 10px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--surface2); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .badge.green { background: rgba(34,197,94,0.15); color: var(--green); }
+  .badge.amber { background: rgba(245,158,11,0.15); color: var(--amber); }
+  .badge.red { background: rgba(239,68,68,0.15); color: var(--red); }
+  .badge.blue { background: rgba(59,130,246,0.15); color: var(--blue); }
+  .progress-bar { background: var(--border); border-radius: 3px; height: 6px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+  .room-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; cursor: pointer; transition: border-color 0.15s; }
+  .room-card:hover, .room-card.selected { border-color: var(--accent); }
+  .room-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
+  .room-card .room-num { font-size: 28px; font-weight: 800; color: var(--accent); }
+  .room-card .room-type { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+  .room-card .room-occ { font-size: 20px; font-weight: 700; }
+  .room-card .room-adr { font-size: 12px; color: var(--muted); }
+  .room-detail { display: none; }
+  .room-detail.active { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .occ-heat { display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; }
+  .heat-cell { border-radius: 4px; padding: 6px 4px; text-align: center; font-size: 10px; font-weight: 600; }
+  .section-title { font-size: 17px; font-weight: 700; margin-bottom: 16px; margin-top: 8px; }
+  .full-width { grid-column: 1 / -1; }
+  .expense-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .expense-bar .name { width: 180px; font-size: 12px; flex-shrink: 0; }
+  .expense-bar .bar { flex: 1; background: var(--border); border-radius: 3px; height: 8px; overflow: hidden; }
+  .expense-bar .fill { height: 100%; border-radius: 3px; }
+  .expense-bar .amt { width: 80px; text-align: right; font-size: 12px; font-weight: 600; }
+  .expense-bar .pct { width: 40px; text-align: right; font-size: 11px; color: var(--muted); }
+  .tag { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 10px; margin-left: 6px; }
+  .tag.fixed { background: rgba(239,68,68,0.15); color: var(--red); }
+  .tag.var { background: rgba(59,130,246,0.15); color: var(--blue); }
+  @media (max-width: 900px) { .room-grid { grid-template-columns: repeat(2,1fr); } .grid-2,.grid-3 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>Boutique Motel <span>Analytics</span></h1>
+    <div class="period">Mar 2025 – Feb 2026 &nbsp;·&nbsp; 10 rooms &nbsp;·&nbsp; 12 months</div>
+  </div>
+  <div style="text-align:right; color: var(--muted); font-size: 12px;">Built by Harry 👻<br>Data: Preno + Xero</div>
+</div>
+
+<div class="nav">
+  <button class="active" onclick="showPage('overview')">Overview</button>
+  <button onclick="showPage('rooms')">By Room</button>
+  <button onclick="showPage('monthly')">Monthly Trends</button>
+  <button onclick="showPage('sources')">Revenue Sources</button>
+  <button onclick="showPage('costs')">Cost Analysis</button>
+</div>
+
+<!-- OVERVIEW -->
+<div id="page-overview" class="page active">
+  <div class="kpi-grid" id="kpi-grid"></div>
+  <div class="grid-2">
+    <div class="card">
+      <h3>Monthly Revenue vs Cost Breakeven</h3>
+      <div class="chart-wrap"><canvas id="chart-monthly-rev"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>Occupancy by Month</h3>
+      <div class="chart-wrap"><canvas id="chart-occ-monthly"></canvas></div>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <h3>Room Performance — Profit per Occupied Night</h3>
+      <div class="chart-wrap"><canvas id="chart-room-margin"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>Revenue by Source</h3>
+      <div class="chart-wrap"><canvas id="chart-sources-pie"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- BY ROOM -->
+<div id="page-rooms" class="page">
+  <div class="section-title">Select a Room</div>
+  <div class="room-grid" id="room-grid"></div>
+  <div class="room-detail" id="room-detail">
+    <div class="card">
+      <h3 id="rd-title">Room Detail</h3>
+      <div class="kpi-grid" id="rd-kpis" style="grid-template-columns: repeat(3,1fr); margin-bottom:16px;"></div>
+      <h3 style="margin-bottom:10px;">Monthly Occupancy</h3>
+      <div class="occ-heat" id="rd-heat"></div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:16px;">
+        <h3>Monthly Revenue & Occupancy</h3>
+        <div class="chart-wrap"><canvas id="chart-room-monthly"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Revenue by Source</h3>
+        <div id="rd-sources"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MONTHLY TRENDS -->
+<div id="page-monthly" class="page">
+  <div class="kpi-grid" id="monthly-kpis" style="grid-template-columns: repeat(4,1fr);"></div>
+  <div class="card" style="margin-bottom:20px;">
+    <h3>ADR (Average Daily Rate) by Month</h3>
+    <div class="chart-wrap-tall"><canvas id="chart-adr"></canvas></div>
+  </div>
+  <div class="card" style="margin-bottom:20px;">
+    <h3>RevPAR by Month</h3>
+    <div class="chart-wrap-tall"><canvas id="chart-revpar"></canvas></div>
+  </div>
+  <div class="card">
+    <h3>Monthly Performance Table</h3>
+    <table id="monthly-table"></table>
+  </div>
+</div>
+
+<!-- SOURCES -->
+<div id="page-sources" class="page">
+  <div class="grid-2">
+    <div class="card">
+      <h3>Revenue by Source</h3>
+      <div class="chart-wrap-tall"><canvas id="chart-src-bar"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>ADR by Source</h3>
+      <div class="chart-wrap-tall"><canvas id="chart-src-adr"></canvas></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Source Detail</h3>
+    <table id="sources-table"></table>
+  </div>
+</div>
+
+<!-- COSTS -->
+<div id="page-costs" class="page">
+  <div class="kpi-grid" id="cost-kpis" style="grid-template-columns: repeat(4,1fr);"></div>
+  <div class="grid-2">
+    <div class="card">
+      <h3>Expense Breakdown</h3>
+      <div id="expense-bars"></div>
+    </div>
+    <div class="card">
+      <h3>Fixed vs Variable Split</h3>
+      <div class="chart-wrap"><canvas id="chart-fixed-var"></canvas></div>
+      <div style="margin-top:16px; font-size:12px; color: var(--muted); line-height:1.8;">
+        <div><span style="color:var(--red)">■</span> <b>Fixed costs</b> — same every month regardless of occupancy (rent, rates, insurance, power, etc.)</div>
+        <div><span style="color:var(--blue)">■</span> <b>Variable costs</b> — scale with occupancy (commissions, laundry, food, cleaning)</div>
+        <div style="margin-top:8px;">At 0% occupancy you still pay <b>$<span id="fixed-per-night-empty"></span>/night</b> across all rooms.</div>
+        <div>Each guest adds approximately <b>$<span id="var-per-night"></span></b> in variable costs.</div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Break-even Analysis by Room</h3>
+    <table id="breakeven-table"></table>
+  </div>
+</div>
+
+<script>
+let DATA = null;
+let roomChart = null;
+
+fetch('analytics-data.json').then(r => r.json()).then(data => {
+  DATA = data;
+  init();
+});
+
+function init() {
+  const D = DATA;
+  const T = D.totals;
+  const months = D.monthly.map(m => m.month.slice(5));
+
+  // ---- OVERVIEW KPIs ----
+  const kpis = [
+    { label: 'Occupancy', value: T.overall_occ + '%', sub: T.total_occupied + ' of ' + T.total_available + ' nights', cls: 'blue' },
+    { label: 'ADR', value: '$' + T.overall_adr, sub: 'Avg daily rate', cls: 'green' },
+    { label: 'RevPAR', value: '$' + T.overall_revpar, sub: 'Revenue per avail room', cls: 'teal' },
+    { label: 'Total Revenue', value: '$' + fmt(T.total_revenue), sub: '12 months', cls: 'green' },
+    { label: 'Total Expenses', value: '$' + fmt(T.total_expenses), sub: 'All operating costs', cls: 'amber' },
+    { label: 'Operating Profit', value: '$' + fmt(T.total_profit), sub: pct(T.total_profit, T.total_revenue) + '% margin', cls: 'purple' },
+    { label: 'Cost/Occ Night', value: '$' + T.cost_per_occ_night, sub: 'To break even per room', cls: 'amber' },
+  ];
+  document.getElementById('kpi-grid').innerHTML = kpis.map(k =>
+    `<div class="kpi ${k.cls}"><div class="label">${k.label}</div><div class="value">${k.value}</div><div class="sub">${k.sub}</div></div>`
+  ).join('');
+
+  // Monthly revenue chart
+  mkChart('chart-monthly-rev', 'bar', months,
+    [{ label: 'Revenue', data: D.monthly.map(m => m.revenue), backgroundColor: 'rgba(99,102,241,0.7)', borderRadius: 4 },
+     { label: 'Breakeven*', data: D.monthly.map(m => {
+       const days = [31,30,31,30,31,31,30,31,30,31,31,28];
+       return Math.round(T.cost_per_occ_night * m.nights);
+     }), backgroundColor: 'rgba(239,68,68,0.3)', borderRadius: 4 }],
+    { legend: true, prefix: '$' });
+
+  // Occupancy monthly
+  mkChart('chart-occ-monthly', 'line', months,
+    [{ label: 'Occupancy %', data: D.monthly.map(m => m.occ), borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', fill: true, tension: 0.3, pointRadius: 4 }],
+    { legend: false, suffix: '%', yMin: 0, yMax: 100 });
+
+  // Room margin bar
+  mkChart('chart-room-margin', 'bar',
+    D.rooms.map(r => 'R' + r.room + ' ' + r.type.split(' ')[0]),
+    [{ label: 'Margin/Night', data: D.rooms.map(r => r.margin_per_night), backgroundColor: D.rooms.map(r => r.margin_per_night > 60 ? 'rgba(34,197,94,0.8)' : r.margin_per_night > 45 ? 'rgba(99,102,241,0.7)' : 'rgba(245,158,11,0.7)'), borderRadius: 4 }],
+    { legend: false, prefix: '$' });
+
+  // Sources pie
+  const srcColors = ['#6366f1','#3b82f6','#14b8a6','#22c55e','#f59e0b','#ef4444','#a855f7','#ec4899','#f97316','#06b6d4','#84cc16','#8b5cf6'];
+  mkChart('chart-sources-pie', 'doughnut',
+    D.sources.map(s => s.name.replace('Booking.com VCC','Booking.com').replace('Direct Booking','Direct')),
+    [{ data: D.sources.map(s => s.revenue), backgroundColor: srcColors, borderWidth: 1, borderColor: '#1a1d27' }],
+    { legend: true, prefix: '$', doughnut: true });
+
+  // ---- BY ROOM ----
+  const rg = document.getElementById('room-grid');
+  rg.innerHTML = D.rooms.map(r => {
+    const col = r.occ >= 70 ? 'var(--green)' : r.occ >= 55 ? 'var(--blue)' : 'var(--amber)';
+    return `<div class="room-card" onclick="showRoom(${r.room})" id="rc-${r.room}">
+      <div class="room-num">${r.room}</div>
+      <div class="room-type">${r.type}</div>
+      <div class="room-occ" style="color:${col}">${r.occ}%</div>
+      <div class="room-adr">ADR $${r.adr} · $${r.margin_per_night}/night profit</div>
+    </div>`;
+  }).join('');
+
+  // ---- MONTHLY ----
+  const bestMonth = D.monthly.reduce((a,b) => b.revpar > a.revpar ? b : a);
+  const worstMonth = D.monthly.reduce((a,b) => b.revpar < a.revpar ? b : a);
+  document.getElementById('monthly-kpis').innerHTML = [
+    { label: 'Best Month', value: bestMonth.month, sub: 'RevPAR $' + bestMonth.revpar, cls: 'green' },
+    { label: 'Worst Month', value: worstMonth.month, sub: 'RevPAR $' + worstMonth.revpar, cls: 'red' },
+    { label: 'Peak ADR', value: '$' + Math.max(...D.monthly.map(m=>m.adr)), sub: 'Feb 2026', cls: 'purple' },
+    { label: 'Avg Bookings/Mo', value: Math.round(D.monthly.reduce((a,m)=>a+m.bookings,0)/12), sub: 'per month', cls: 'blue' },
+  ].map(k => `<div class="kpi ${k.cls}"><div class="label">${k.label}</div><div class="value">${k.value}</div><div class="sub">${k.sub}</div></div>`).join('');
+
+  mkChart('chart-adr', 'bar', months,
+    [{ label: 'ADR', data: D.monthly.map(m=>m.adr), backgroundColor: 'rgba(168,85,247,0.7)', borderRadius: 4 },
+     { label: 'Cost/Occ Night', data: D.monthly.map(() => T.cost_per_occ_night), type: 'line', borderColor: '#ef4444', borderDash: [5,4], pointRadius: 0, borderWidth: 2, fill: false }],
+    { legend: true, prefix: '$' });
+
+  mkChart('chart-revpar', 'line', months,
+    [{ label: 'RevPAR', data: D.monthly.map(m=>m.revpar), borderColor: '#14b8a6', backgroundColor: 'rgba(20,184,166,0.1)', fill: true, tension: 0.3, pointRadius: 4 }],
+    { legend: false, prefix: '$' });
+
+  const mt = document.getElementById('monthly-table');
+  mt.innerHTML = '<tr><th>Month</th><th>Nights</th><th>Occ%</th><th>ADR</th><th>RevPAR</th><th>Revenue</th><th>Bookings</th><th>vs Breakeven</th></tr>' +
+    D.monthly.map(m => {
+      const be = T.cost_per_occ_night * m.nights / 10;
+      const revPerRoom = m.revenue / 10;
+      const diff = revPerRoom - be;
+      const cls = diff >= 0 ? 'green' : 'red';
+      return `<tr>
+        <td><b>${m.month}</b></td>
+        <td>${m.nights}</td>
+        <td>${m.occ}%</td>
+        <td>$${m.adr}</td>
+        <td>$${m.revpar}</td>
+        <td>$${fmt(m.revenue)}</td>
+        <td>${m.bookings}</td>
+        <td><span class="badge ${cls}">${diff>=0?'+':''}$${Math.round(diff)}/room</span></td>
+      </tr>`;
+    }).join('');
+
+  // ---- SOURCES ----
+  mkChart('chart-src-bar', 'bar',
+    D.sources.map(s => s.name.replace('Booking.com VCC','BDC').replace('Direct Booking','Direct')),
+    [{ label: 'Revenue', data: D.sources.map(s=>s.revenue), backgroundColor: srcColors, borderRadius: 4 }],
+    { legend: false, prefix: '$' });
+
+  mkChart('chart-src-adr', 'bar',
+    D.sources.map(s => s.name.replace('Booking.com VCC','BDC').replace('Direct Booking','Direct')),
+    [{ label: 'ADR', data: D.sources.map(s=>s.adr), backgroundColor: D.sources.map(s => s.adr >= T.overall_adr ? 'rgba(34,197,94,0.7)' : 'rgba(239,68,68,0.6)'), borderRadius: 4 }],
+    { legend: false, prefix: '$' });
+
+  document.getElementById('sources-table').innerHTML =
+    '<tr><th>Source</th><th>Bookings</th><th>Nights</th><th>ADR</th><th>Revenue</th><th>% of Total</th><th>vs Avg ADR</th></tr>' +
+    D.sources.map(s => {
+      const pct_ = Math.round(s.revenue / T.total_revenue * 100);
+      const adrDiff = s.adr - T.overall_adr;
+      return `<tr>
+        <td><b>${s.name}</b></td>
+        <td>${s.bookings}</td>
+        <td>${s.nights}</td>
+        <td>$${s.adr}</td>
+        <td>$${fmt(s.revenue)}</td>
+        <td>${pct_}%</td>
+        <td><span class="badge ${adrDiff>=0?'green':'red'}">${adrDiff>=0?'+':''}$${Math.round(adrDiff)}</span></td>
+      </tr>`;
+    }).join('');
+
+  // ---- COSTS ----
+  const fixedTotal = D.expenses.filter(e=>e.fixed).reduce((a,e)=>a+e.amount,0);
+  const varTotal = D.expenses.filter(e=>!e.fixed).reduce((a,e)=>a+e.amount,0);
+  document.getElementById('cost-kpis').innerHTML = [
+    { label: 'Total Expenses', value: '$' + fmt(T.total_expenses), sub: '12 months', cls: 'amber' },
+    { label: 'Fixed Costs', value: '$' + fmt(fixedTotal), sub: pct(fixedTotal,T.total_expenses) + '% of total', cls: 'red' },
+    { label: 'Variable Costs', value: '$' + fmt(varTotal), sub: pct(varTotal,T.total_expenses) + '% of total', cls: 'blue' },
+    { label: 'Cost/Room/Month', value: '$' + fmt(Math.round(T.total_expenses/120)), sub: 'Average all rooms', cls: 'purple' },
+  ].map(k => `<div class="kpi ${k.cls}"><div class="label">${k.label}</div><div class="value">${k.value}</div><div class="sub">${k.sub}</div></div>`).join('');
+
+  const eb = document.getElementById('expense-bars');
+  eb.innerHTML = D.expenses.map(e => {
+    const w = Math.round(e.amount / T.total_expenses * 100);
+    const col = e.fixed ? '#ef4444' : '#3b82f6';
+    const tag = e.fixed ? '<span class="tag fixed">fixed</span>' : '<span class="tag var">variable</span>';
+    return `<div class="expense-bar">
+      <div class="name">${e.name}${tag}</div>
+      <div class="bar"><div class="fill" style="width:${w}%;background:${col}"></div></div>
+      <div class="amt">$${fmt(e.amount)}</div>
+      <div class="pct">${w}%</div>
+    </div>`;
+  }).join('');
+
+  mkChart('chart-fixed-var', 'doughnut', ['Fixed', 'Variable'],
+    [{ data: [fixedTotal, varTotal], backgroundColor: ['rgba(239,68,68,0.7)', 'rgba(59,130,246,0.7)'], borderWidth: 1, borderColor: '#1a1d27' }],
+    { legend: true, prefix: '$', doughnut: true });
+
+  document.getElementById('fixed-per-night-empty').textContent = (fixedTotal / (365*10)).toFixed(2);
+  document.getElementById('var-per-night').textContent = T.variable_per_night;
+
+  const bt = document.getElementById('breakeven-table');
+  bt.innerHTML = '<tr><th>Room</th><th>Type</th><th>Occ %</th><th>ADR</th><th>Cost/Night</th><th>Margin/Night</th><th>Annual Revenue</th><th>Annual Profit</th><th>Margin %</th></tr>' +
+    D.rooms.map(r => {
+      const cls = r.margin >= 35 ? 'green' : r.margin >= 25 ? 'blue' : 'amber';
+      return `<tr>
+        <td><b>${r.room}</b></td>
+        <td>${r.type}</td>
+        <td>${r.occ}%</td>
+        <td>$${r.adr}</td>
+        <td>$${r.cost_per_night}</td>
+        <td><span class="badge ${r.margin_per_night > 0 ? 'green' : 'red'}">$${r.margin_per_night > 0 ? '+' : ''}${r.margin_per_night}</span></td>
+        <td>$${fmt(r.revenue)}</td>
+        <td>$${fmt(r.profit)}</td>
+        <td><span class="badge ${cls}">${r.margin}%</span></td>
+      </tr>`;
+    }).join('');
+}
+
+function showRoom(rnum) {
+  document.querySelectorAll('.room-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('rc-' + rnum).classList.add('selected');
+
+  const r = DATA.rooms.find(x => x.room === rnum);
+  const months = ['Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb'];
+
+  document.getElementById('rd-title').textContent = 'Room ' + r.room + ' — ' + r.type;
+  document.getElementById('rd-kpis').innerHTML = [
+    { label: 'Occupancy', value: r.occ + '%', cls: r.occ >= 70 ? 'green' : 'blue' },
+    { label: 'ADR', value: '$' + r.adr, cls: 'purple' },
+    { label: 'RevPAR', value: '$' + r.revpar, cls: 'teal' },
+    { label: 'Annual Revenue', value: '$' + fmt(r.revenue), cls: 'green' },
+    { label: 'Annual Profit', value: '$' + fmt(r.profit), cls: 'green' },
+    { label: 'Profit Margin', value: r.margin + '%', cls: r.margin >= 35 ? 'green' : 'amber' },
+  ].map(k => `<div class="kpi ${k.cls}"><div class="label">${k.label}</div><div class="value">${k.value}</div></div>`).join('');
+
+  // Heat cells
+  const heat = document.getElementById('rd-heat');
+  heat.innerHTML = r.monthly_occ.map((n, i) => {
+    const pct_ = n / r.monthly_days[i];
+    const bg = pct_ >= 0.8 ? '#22c55e' : pct_ >= 0.6 ? '#3b82f6' : pct_ >= 0.4 ? '#f59e0b' : '#ef4444';
+    return `<div class="heat-cell" style="background:${bg}20; color:${bg}; border: 1px solid ${bg}40">
+      <div>${months[i]}</div><div style="font-size:13px">${n}</div>
+    </div>`;
+  }).join('');
+
+  // Room monthly chart
+  if (roomChart) roomChart.destroy();
+  const ctx = document.getElementById('chart-room-monthly').getContext('2d');
+  roomChart = new Chart(ctx, {
+    data: {
+      labels: months,
+      datasets: [
+        { type: 'bar', label: 'Revenue', data: r.monthly_rev, backgroundColor: 'rgba(99,102,241,0.7)', borderRadius: 3, yAxisID: 'y' },
+        { type: 'line', label: 'Occ %', data: r.monthly_occ.map((n,i) => Math.round(n/r.monthly_days[i]*100)), borderColor: '#22c55e', backgroundColor: 'transparent', tension: 0.3, pointRadius: 3, yAxisID: 'y1' }
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#8b90a8', font: { size: 11 } } } }, scales: {
+      x: { ticks: { color: '#8b90a8', font: { size: 10 } }, grid: { color: '#2e3248' } },
+      y: { ticks: { color: '#8b90a8', font: { size: 10 }, callback: v => '$'+v }, grid: { color: '#2e3248' } },
+      y1: { position: 'right', ticks: { color: '#22c55e', font: { size: 10 }, callback: v => v+'%' }, grid: { display: false }, min: 0, max: 100 }
+    }}
+  });
+
+  // Sources
+  document.getElementById('rd-sources').innerHTML = r.top_sources.map(s => {
+    const w = Math.round(s.revenue / r.revenue * 100);
+    return `<div class="expense-bar" style="margin-bottom:10px">
+      <div class="name" style="width:200px;font-size:12px">${s.name.replace('Booking.com VCC','Booking.com').replace('Direct Booking','Direct')}</div>
+      <div class="bar"><div class="fill" style="width:${w}%;background:#6366f1"></div></div>
+      <div class="amt">$${fmt(s.revenue)}</div>
+      <div class="pct">${s.nights}n</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('room-detail').classList.add('active');
+}
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function mkChart(id, type, labels, datasets, opts = {}) {
+  const ctx = document.getElementById(id);
+  if (!ctx) return;
+  new Chart(ctx, {
+    type: type,
+    data: { labels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: !!opts.legend, labels: { color: '#8b90a8', font: { size: 11 }, boxWidth: 12, padding: 10 } },
+        tooltip: { callbacks: { label: ctx => {
+          const v = ctx.parsed.y ?? ctx.parsed;
+          if (opts.prefix) return ' ' + opts.prefix + (typeof v === 'number' ? v.toLocaleString() : v);
+          if (opts.suffix) return ' ' + v + opts.suffix;
+          return ' ' + v;
+        }}}
+      },
+      cutout: opts.doughnut ? '60%' : undefined,
+      scales: type === 'doughnut' ? {} : {
+        x: { ticks: { color: '#8b90a8', font: { size: 10 } }, grid: { color: '#2e3248' } },
+        y: { ticks: { color: '#8b90a8', font: { size: 10 }, callback: v => opts.prefix ? opts.prefix + v.toLocaleString() : v + (opts.suffix||'') }, grid: { color: '#2e3248' }, min: opts.yMin, max: opts.yMax }
+      }
+    }
+  });
+}
+
+function fmt(n) { return Math.round(n).toLocaleString(); }
+function pct(a, b) { return Math.round(a/b*100); }
+</script>
+</body>
+</html>

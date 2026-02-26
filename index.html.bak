@@ -82,49 +82,6 @@
   .tag { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 10px; margin-left: 6px; }
   .tag.fixed { background: rgba(239,68,68,0.15); color: var(--red); }
   .tag.var { background: rgba(59,130,246,0.15); color: var(--blue); }
-
-  /* Metric tooltips */
-  .metric-tip { position: relative; display: inline-flex; align-items: center; gap: 4px; cursor: help; }
-  .metric-tip::after {
-    content: attr(data-tip);
-    position: absolute;
-    bottom: calc(100% + 8px);
-    left: 50%;
-    transform: translateX(-50%);
-    background: #1a1d2e;
-    color: #fff;
-    font-size: 12px;
-    font-weight: 400;
-    line-height: 1.5;
-    padding: 8px 12px;
-    border-radius: 7px;
-    white-space: pre-line;
-    width: max-content;
-    max-width: 260px;
-    text-transform: none;
-    letter-spacing: 0;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.15s;
-    z-index: 100;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
-  }
-  .metric-tip::before {
-    content: '';
-    position: absolute;
-    bottom: calc(100% + 2px);
-    left: 50%;
-    transform: translateX(-50%);
-    border: 6px solid transparent;
-    border-top-color: #1a1d2e;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.15s;
-    z-index: 100;
-  }
-  .metric-tip:hover::after, .metric-tip:hover::before { opacity: 1; }
-  .metric-tip .tip-icon { width: 14px; height: 14px; background: var(--border); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: var(--muted); flex-shrink: 0; }
-
   @media (max-width: 900px) { .room-grid { grid-template-columns: repeat(2,1fr); } .grid-2,.grid-3 { grid-template-columns: 1fr; } }
 </style>
 </head>
@@ -199,11 +156,11 @@
 <div id="page-monthly" class="page">
   <div class="kpi-grid" id="monthly-kpis" style="grid-template-columns: repeat(4,1fr);"></div>
   <div class="card" style="margin-bottom:20px;">
-    <h3><span class="metric-tip" data-tip="ADR — Average Daily Rate&#10;Total room revenue ÷ occupied nights.&#10;Measures how much you earn per booked room,&#10;ignoring empty rooms.">ADR (Average Daily Rate) <span class="tip-icon">?</span></span></h3>
+    <h3>ADR (Average Daily Rate) by Month</h3>
     <div class="chart-wrap-tall"><canvas id="chart-adr"></canvas></div>
   </div>
   <div class="card" style="margin-bottom:20px;">
-    <h3><span class="metric-tip" data-tip="RevPAR — Revenue Per Available Room&#10;ADR × Occupancy rate.&#10;The single best metric — combines how full&#10;you are AND how much you're charging.&#10;Example: 67.8% occ × $172 ADR = $116.62 RevPAR">RevPAR <span class="tip-icon">?</span></span></h3>
+    <h3>RevPAR by Month</h3>
     <div class="chart-wrap-tall"><canvas id="chart-revpar"></canvas></div>
   </div>
   <div class="card">
@@ -220,7 +177,7 @@
       <div class="chart-wrap-tall"><canvas id="chart-src-bar"></canvas></div>
     </div>
     <div class="card">
-      <h3><span class="metric-tip" data-tip="ADR — Average Daily Rate&#10;Revenue ÷ occupied nights for each source.&#10;Green = above your average ADR of $172.&#10;Red = below average.">ADR by Source <span class="tip-icon">?</span></span></h3>
+      <h3>ADR by Source</h3>
       <div class="chart-wrap-tall"><canvas id="chart-src-adr"></canvas></div>
     </div>
   </div>
@@ -272,8 +229,8 @@ function init() {
   // ---- OVERVIEW KPIs ----
   const kpis = [
     { label: 'Occupancy', value: T.overall_occ + '%', sub: T.total_occupied + ' of ' + T.total_available + ' nights', cls: 'blue' },
-    { label: '<span class="metric-tip" data-tip="ADR — Average Daily Rate&#10;Total revenue ÷ occupied nights.&#10;How much you earn per booked room,&#10;ignoring empty rooms.">ADR <span class=\'tip-icon\'>?</span></span>', value: '$' + T.overall_adr, sub: 'Avg daily rate', cls: 'green', rawLabel: true },
-    { label: '<span class="metric-tip" data-tip="RevPAR — Revenue Per Available Room&#10;ADR × Occupancy rate.&#10;The single best metric — captures&#10;both how full you are and your rate.">RevPAR <span class=\'tip-icon\'>?</span></span>', value: '$' + T.overall_revpar, sub: 'Revenue per avail room', cls: 'teal', rawLabel: true },
+    { label: 'ADR', value: '$' + T.overall_adr, sub: 'Avg daily rate', cls: 'green' },
+    { label: 'RevPAR', value: '$' + T.overall_revpar, sub: 'Revenue per avail room', cls: 'teal' },
     { label: 'Total Revenue', value: '$' + fmt(T.total_revenue), sub: '12 months', cls: 'green' },
     { label: 'Total Expenses', value: '$' + fmt(T.total_expenses), sub: 'All operating costs', cls: 'amber' },
     { label: 'Operating Profit', value: '$' + fmt(T.total_profit), sub: pct(T.total_profit, T.total_revenue) + '% margin', cls: 'purple' },
@@ -342,7 +299,7 @@ function init() {
     { legend: false, prefix: '$' });
 
   const mt = document.getElementById('monthly-table');
-  mt.innerHTML = '<tr><th>Month</th><th>Nights</th><th>Occ%</th><th><span class="metric-tip" data-tip="ADR — Average Daily Rate&#10;Revenue ÷ occupied nights.">ADR <span class=\'tip-icon\'>?</span></span></th><th><span class="metric-tip" data-tip="RevPAR — Revenue Per Available Room&#10;ADR × Occupancy rate.">RevPAR <span class=\'tip-icon\'>?</span></span></th><th>Revenue</th><th>Bookings</th><th>vs Breakeven</th></tr>' +
+  mt.innerHTML = '<tr><th>Month</th><th>Nights</th><th>Occ%</th><th>ADR</th><th>RevPAR</th><th>Revenue</th><th>Bookings</th><th>vs Breakeven</th></tr>' +
     D.monthly.map(m => {
       const be = T.cost_per_occ_night * m.nights / 10;
       const revPerRoom = m.revenue / 10;
@@ -418,7 +375,7 @@ function init() {
   document.getElementById('var-per-night').textContent = T.variable_per_night;
 
   const bt = document.getElementById('breakeven-table');
-  bt.innerHTML = '<tr><th>Room</th><th>Type</th><th>Occ %</th><th><span class="metric-tip" data-tip="ADR — Average Daily Rate&#10;Revenue ÷ occupied nights for this room.">ADR <span class=\'tip-icon\'>?</span></span></th><th>Cost/Night</th><th>Margin/Night</th><th>Annual Revenue</th><th>Annual Profit</th><th>Margin %</th></tr>' +
+  bt.innerHTML = '<tr><th>Room</th><th>Type</th><th>Occ %</th><th>ADR</th><th>Cost/Night</th><th>Margin/Night</th><th>Annual Revenue</th><th>Annual Profit</th><th>Margin %</th></tr>' +
     D.rooms.map(r => {
       const cls = r.margin >= 35 ? 'green' : r.margin >= 25 ? 'blue' : 'amber';
       return `<tr>
@@ -445,8 +402,8 @@ function showRoom(rnum) {
   document.getElementById('rd-title').textContent = 'Room ' + r.room + ' — ' + r.type;
   document.getElementById('rd-kpis').innerHTML = [
     { label: 'Occupancy', value: r.occ + '%', cls: r.occ >= 70 ? 'green' : 'blue' },
-    { label: '<span class="metric-tip" data-tip="ADR — Average Daily Rate&#10;Revenue ÷ occupied nights for this room.">ADR <span class=\'tip-icon\'>?</span></span>', value: '$' + r.adr, cls: 'purple' },
-    { label: '<span class="metric-tip" data-tip="RevPAR — Revenue Per Available Room&#10;ADR × Occupancy. Accounts for both&#10;rate and how often the room is filled.">RevPAR <span class=\'tip-icon\'>?</span></span>', value: '$' + r.revpar, cls: 'teal' },
+    { label: 'ADR', value: '$' + r.adr, cls: 'purple' },
+    { label: 'RevPAR', value: '$' + r.revpar, cls: 'teal' },
     { label: 'Annual Revenue', value: '$' + fmt(r.revenue), cls: 'green' },
     { label: 'Annual Profit', value: '$' + fmt(r.profit), cls: 'green' },
     { label: 'Profit Margin', value: r.margin + '%', cls: r.margin >= 35 ? 'green' : 'amber' },

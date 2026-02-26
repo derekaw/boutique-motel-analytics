@@ -144,6 +144,7 @@
   <button onclick="showPage('monthly')">Monthly Trends</button>
   <button onclick="showPage('sources')">Revenue Sources</button>
   <button onclick="showPage('costs')">Cost Analysis</button>
+  <button onclick="showPage('benchmarks')">📊 Benchmarks</button>
 </div>
 
 <!-- OVERVIEW -->
@@ -258,6 +259,66 @@
     <h3>Break-even Analysis by Room</h3>
     <table id="breakeven-table"></table>
   </div>
+</div>
+
+<!-- BENCHMARKS -->
+<div id="page-benchmarks" class="page">
+
+  <div class="section-title">How We Compare — Industry Benchmarks</div>
+  <div style="font-size:12px; color:var(--muted); margin-bottom:20px;">Sources: CBRE NZ H1 2025, Horwath HTL Nelson/Marlborough Jun 2025, MBIE Accommodation Data Programme, TakeUp AI 2025 RevPAR Benchmarks. Research: Feb 2026.</div>
+
+  <!-- Comparison KPIs -->
+  <div id="bench-kpis" style="display:grid; grid-template-columns: repeat(4,1fr); gap:16px; margin-bottom:28px;"></div>
+
+  <!-- Side-by-side chart -->
+  <div class="grid-2" style="margin-bottom:20px;">
+    <div class="card">
+      <h3>Occupancy — Us vs Benchmarks</h3>
+      <div class="chart-wrap"><canvas id="chart-bench-occ"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>ADR — Us vs Benchmarks</h3>
+      <div class="chart-wrap"><canvas id="chart-bench-adr"></canvas></div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:20px;">
+    <div class="card">
+      <h3>RevPAR — Us vs Benchmarks</h3>
+      <div class="chart-wrap"><canvas id="chart-bench-revpar"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>Operating Profit Margin — Us vs Benchmarks</h3>
+      <div class="chart-wrap"><canvas id="chart-bench-margin"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Full comparison table -->
+  <div class="card" style="margin-bottom:20px;">
+    <h3>Full Benchmark Comparison</h3>
+    <table id="bench-table"></table>
+  </div>
+
+  <!-- Gap analysis -->
+  <div class="card" style="margin-bottom:20px;">
+    <h3>Gap Analysis — Where We Can Improve</h3>
+    <table id="gap-table"></table>
+  </div>
+
+  <!-- Financial impact modelling -->
+  <div class="section-title" style="margin-top:8px;">Financial Impact Modelling</div>
+  <div style="font-size:12px; color:var(--muted); margin-bottom:16px;">What hitting our targets would actually mean in dollars.</div>
+  <div id="impact-cards" style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:20px;"></div>
+
+  <div class="card" style="margin-bottom:20px;">
+    <h3>Revenue Impact — Scenarios</h3>
+    <div class="chart-wrap-tall"><canvas id="chart-scenarios"></canvas></div>
+  </div>
+
+  <!-- Roadmap -->
+  <div class="section-title" style="margin-top:8px;">Improvement Roadmap</div>
+  <div id="roadmap"></div>
+
 </div>
 
 <script>
@@ -452,6 +513,147 @@ function init() {
         <td><span class="badge ${cls}">${r.margin}%</span></td>
       </tr>`;
     }).join('');
+
+  // ---- BENCHMARKS ----
+  initBenchmarks(D, T);
+}
+
+function initBenchmarks(D, T) {
+  const us = {
+    occ: T.overall_occ,
+    adr: T.overall_adr,
+    revpar: T.overall_revpar,
+    margin: Math.round(T.total_profit / T.total_revenue * 100)
+  };
+
+  // Benchmark data (from research report, Feb 2026)
+  const benchmarks = [
+    { name: 'Us',                       occ: us.occ,  adr: us.adr,  revpar: us.revpar, margin: us.margin, highlight: true },
+    { name: 'NZ Motel Avg',             occ: 55,      adr: 160,     revpar: 88,        margin: 12  },
+    { name: 'Nelson/Marlborough Hotels',occ: 50,      adr: 180,     revpar: 90,        margin: null},
+    { name: 'Nelson STR (Airbnb etc)',  occ: 61,      adr: 216,     revpar: 132,       margin: null},
+    { name: 'NZ Hotels (CBRE H1 2025)', occ: 60,      adr: 215,     revpar: 129,       margin: null},
+    { name: 'Global Boutique (TakeUp)', occ: 63,      adr: 310,     revpar: 196,       margin: null},
+    { name: 'Our 12-Month Target',      occ: 75,      adr: 182,     revpar: 137,       margin: 29,  target: true },
+  ];
+
+  // KPI summary cards
+  document.getElementById('bench-kpis').innerHTML = [
+    { label: 'vs NZ Motel Avg Occ',   value: '+' + (us.occ - 55).toFixed(1) + 'pp', sub: 'We beat average by 12.8pp', cls: 'green' },
+    { label: 'ADR vs Nelson STR',      value: '-$' + Math.round(216 - us.adr),        sub: 'Room to grow rates',         cls: 'amber' },
+    { label: 'vs NZ Motel Avg Margin', value: '+' + (us.margin - 12) + 'pp',          sub: us.margin + '% vs 12% avg',   cls: 'green' },
+    { label: 'RevPAR vs NZ Hotels',    value: '-$' + Math.round(129 - us.revpar),      sub: 'Hotel RevPAR $129',          cls: 'blue'  },
+  ].map(k => `<div class="kpi ${k.cls}"><div class="label">${k.label}</div><div class="value">${k.value}</div><div class="sub">${k.sub}</div></div>`).join('');
+
+  // Chart colours
+  const colors = benchmarks.map(b => b.highlight ? 'rgba(99,102,241,0.9)' : b.target ? 'rgba(34,197,94,0.85)' : 'rgba(148,163,184,0.6)');
+
+  const labels = benchmarks.map(b => b.name);
+  mkChart('chart-bench-occ',    'bar', labels, [{ label: 'Occupancy %', data: benchmarks.map(b=>b.occ),    backgroundColor: colors, borderRadius:4 }], { legend:false, suffix:'%', yMin:0, yMax:100 });
+  mkChart('chart-bench-adr',    'bar', labels, [{ label: 'ADR $',       data: benchmarks.map(b=>b.adr),    backgroundColor: colors, borderRadius:4 }], { legend:false, prefix:'$' });
+  mkChart('chart-bench-revpar', 'bar', labels, [{ label: 'RevPAR $',    data: benchmarks.map(b=>b.revpar), backgroundColor: colors, borderRadius:4 }], { legend:false, prefix:'$' });
+  mkChart('chart-bench-margin', 'bar', labels,
+    [{ label: 'Margin %', data: benchmarks.map(b=>b.margin||0), backgroundColor: colors, borderRadius:4 }],
+    { legend:false, suffix:'%' });
+
+  // Full comparison table
+  document.getElementById('bench-table').innerHTML =
+    '<tr><th>Property Type</th><th>Occupancy</th><th>ADR</th><th>RevPAR</th><th>Margin</th><th>Notes</th></tr>' +
+    benchmarks.map(b => {
+      const rowStyle = b.highlight ? 'background:rgba(99,102,241,0.06); font-weight:600;' : b.target ? 'background:rgba(34,197,94,0.06);' : '';
+      return `<tr style="${rowStyle}">
+        <td>${b.highlight ? '⭐ ' : b.target ? '🎯 ' : ''}${b.name}</td>
+        <td>${b.occ}%</td>
+        <td>$${b.adr}</td>
+        <td>$${b.revpar}</td>
+        <td>${b.margin != null ? b.margin + '%' : '—'}</td>
+        <td style="color:var(--muted);font-size:11px;">${b.highlight ? 'Mar 2025–Feb 2026' : b.target ? '12-month target' : 'Industry benchmark'}</td>
+      </tr>`;
+    }).join('');
+
+  // Gap analysis table
+  const gaps = [
+    { area: 'Winter Occupancy (Jun–Aug)', ours: '42–54%',     target: '55–62%',   gap: '8–13pp gap',    impact: '+$10,000–$20,000 pa',   priority: 'HIGH',   badge: 'red'   },
+    { area: 'ADR',                        ours: '$' + us.adr,  target: '$182–$185', gap: '$' + Math.round(182-us.adr) + '/night gap', impact: '+$' + fmt(Math.round((182-us.adr)*T.total_occupied)) + ' pa', priority: 'HIGH', badge: 'red' },
+    { area: 'Direct Booking Share',       ours: 'Est. <20%',   target: '30–40%',   gap: '10–20pp gap',   impact: '+$8,000–$12,000 pa',    priority: 'MED',    badge: 'amber' },
+    { area: 'OTA Commission Rate',        ours: 'Est. 15%',    target: '10–12%',   gap: '3–5pp reduction',impact: '+$5,000–$8,000 pa',    priority: 'MED',    badge: 'amber' },
+    { area: 'Annual Occupancy',           ours: us.occ + '%',  target: '72–75%',   gap: (72-us.occ).toFixed(1) + 'pp gap', impact: '+$40,000–$45,000 pa', priority: 'HIGH', badge: 'red' },
+    { area: 'Profit Margin',             ours: us.margin + '%',target: '28–30%',   gap: (28-us.margin) + 'pp gap',         impact: 'Driven by above',       priority: 'MED', badge: 'amber' },
+  ];
+
+  document.getElementById('gap-table').innerHTML =
+    '<tr><th>Area</th><th>Current</th><th>Target</th><th>Gap</th><th>Est. Impact</th><th>Priority</th></tr>' +
+    gaps.map(g => `<tr>
+      <td><b>${g.area}</b></td>
+      <td>${g.ours}</td>
+      <td style="color:var(--green)">${g.target}</td>
+      <td style="color:var(--muted);font-size:12px;">${g.gap}</td>
+      <td style="color:var(--blue);font-weight:600;">${g.impact}</td>
+      <td><span class="badge ${g.badge}">${g.priority}</span></td>
+    </tr>`).join('');
+
+  // Impact modelling cards
+  const currentRevenue = T.total_revenue;
+  const adrLift10 = Math.round(T.total_occupied * 10);
+  const occ75revenue = Math.round(0.75 * 3650 * us.adr);
+  const combinedRevenue = Math.round(0.75 * 3650 * 182);
+  document.getElementById('impact-cards').innerHTML = [
+    { label: '+$10 ADR increase',         value: '+$' + fmt(adrLift10),   sub: 'Pure profit — no extra cost',         cls: 'green'  },
+    { label: '+7pp occupancy to 75%',     value: '+$' + fmt(occ75revenue - currentRevenue), sub: 'Additional gross revenue',  cls: 'blue'   },
+    { label: 'Combined (75% + $182 ADR)', value: '+$' + fmt(combinedRevenue - currentRevenue), sub: 'vs current performance', cls: 'purple' },
+  ].map(k => `<div class="kpi ${k.cls}" style="padding:20px;"><div class="label" style="font-size:12px;margin-bottom:8px;">${k.label}</div><div class="value" style="font-size:28px;">${k.value}</div><div class="sub">${k.sub}</div></div>`).join('');
+
+  // Scenario chart
+  mkChart('chart-scenarios', 'bar',
+    ['Current\n(67.8% / $' + us.adr + ')', '+$10 ADR\n(67.8% / $' + (us.adr+10) + ')', '+7pp Occ\n(75% / $' + us.adr + ')', 'Both\n(75% / $182)', 'Stretch\n(80% / $195)'],
+    [{ label: 'Annual Revenue',
+       data: [
+         currentRevenue,
+         Math.round(T.total_occupied * (us.adr + 10)),
+         Math.round(0.75 * 3650 * us.adr),
+         Math.round(0.75 * 3650 * 182),
+         Math.round(0.80 * 3650 * 195),
+       ],
+       backgroundColor: ['rgba(148,163,184,0.7)','rgba(99,102,241,0.7)','rgba(59,130,246,0.7)','rgba(34,197,94,0.8)','rgba(168,85,247,0.8)'],
+       borderRadius: 4
+    }],
+    { legend: false, prefix: '$' });
+
+  // Roadmap
+  const roadmap = [
+    { tier: '🚀 Quick Wins (0–3 months)', color: 'var(--green)', items: [
+      { action: 'Dynamic Pricing',         detail: 'Set rate rules: raise rates when >80% occupancy, lower when <50% within 14 days. Tools: PriceLabs (~$80/mo) or Little Hotelier Dynamic Revenue Plus.',  impact: '+$20,000–$30,000 pa' },
+      { action: 'Raise Premium Room Rates',detail: 'Spa room and garden room should command $30–$50+ premium. Benchmark on Booking.com and lift base rates $10–$15 for peak season.',                        impact: '+$15,000–$25,000 pa' },
+      { action: 'Direct Booking Push',     detail: 'Add "Book Direct & Save" messaging to website. Offer value-add (late checkout, welcome hamper) instead of discounting. Best rate guarantee.',          impact: '+$8,000–$12,000 pa saved commissions' },
+    ]},
+    { tier: '📈 Strategic (3–6 months)', color: 'var(--blue)', items: [
+      { action: 'Winter Packages',         detail: '"Winter Escape" 2-night package, "Work From Nelson" weekly rate ($100–$110/night for 7+ nights), midweek specials. Floor: never below $120/night.',    impact: '+$10,000–$20,000 pa' },
+      { action: 'Diversify OTA Mix',       detail: 'Reduce Booking.com from 60%+ to ~40%. Add Airbnb (3% host fee), Google Hotel Ads (CPC, ~8–12% effective), Wotif/Agoda.',                              impact: '+$3,000–$5,000 pa commission savings' },
+      { action: 'Corporate Rate Programme',detail: 'Approach Nelson businesses/contractors. Flat $145–$155/night rate for negotiated volume. Target 80–100 extra midweek nights pa.',                       impact: '+$12,000–$15,000 pa' },
+    ]},
+    { tier: '🏆 Long-term (6–12 months)', color: 'var(--purple)', items: [
+      { action: 'Google Business & SEO',   detail: 'Optimise Google Business listing, professional photos, regular posts. Target "motel Nelson" and "accommodation Stoke Nelson" search terms.',             impact: 'Drives direct bookings over time' },
+      { action: 'Guest Loyalty Programme', detail: 'Collect emails, send quarterly newsletters with 10% return-stay discount for direct bookings.',                                                         impact: '+$5,000–$10,000 pa repeat revenue' },
+      { action: 'Review Subscriptions',    detail: 'Subscriptions at $14,200/yr — audit each one. Cancel anything unused or underutilised.',                                                               impact: 'Potential $2,000–$5,000 savings' },
+    ]},
+  ];
+
+  document.getElementById('roadmap').innerHTML = roadmap.map(tier => `
+    <div class="card" style="margin-bottom:16px; border-left:3px solid ${tier.color};">
+      <h3 style="margin-bottom:16px;">${tier.tier}</h3>
+      <table style="width:100%; border-collapse:collapse; font-size:13px;">
+        <tr><th style="text-align:left;padding:6px 10px;color:var(--muted);font-size:11px;text-transform:uppercase;border-bottom:1px solid var(--border);">Action</th>
+            <th style="text-align:left;padding:6px 10px;color:var(--muted);font-size:11px;text-transform:uppercase;border-bottom:1px solid var(--border);">How</th>
+            <th style="text-align:right;padding:6px 10px;color:var(--muted);font-size:11px;text-transform:uppercase;border-bottom:1px solid var(--border);">Est. Impact</th></tr>
+        ${tier.items.map(i => `
+        <tr>
+          <td style="padding:10px;font-weight:600;vertical-align:top;white-space:nowrap;">${i.action}</td>
+          <td style="padding:10px;color:var(--muted);font-size:12px;line-height:1.5;">${i.detail}</td>
+          <td style="padding:10px;text-align:right;font-weight:600;color:var(--green);white-space:nowrap;">${i.impact}</td>
+        </tr>`).join('')}
+      </table>
+    </div>
+  `).join('');
 }
 
 function showRoom(rnum) {

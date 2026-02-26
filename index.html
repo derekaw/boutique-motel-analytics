@@ -7,19 +7,19 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
   :root {
-    --bg: #0f1117;
-    --surface: #1a1d27;
-    --surface2: #22263a;
-    --border: #2e3248;
-    --text: #e8eaf0;
-    --muted: #8b90a8;
-    --green: #22c55e;
-    --red: #ef4444;
-    --blue: #3b82f6;
-    --amber: #f59e0b;
-    --purple: #a855f7;
-    --teal: #14b8a6;
-    --accent: #6366f1;
+    --bg: #f0f2f7;
+    --surface: #ffffff;
+    --surface2: #e8eaf2;
+    --border: #d1d5e0;
+    --text: #1a1d2e;
+    --muted: #6b7280;
+    --green: #16a34a;
+    --red: #dc2626;
+    --blue: #2563eb;
+    --amber: #d97706;
+    --purple: #7c3aed;
+    --teal: #0f766e;
+    --accent: #4f46e5;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.5; }
@@ -264,7 +264,7 @@ function init() {
   const srcColors = ['#6366f1','#3b82f6','#14b8a6','#22c55e','#f59e0b','#ef4444','#a855f7','#ec4899','#f97316','#06b6d4','#84cc16','#8b5cf6'];
   mkChart('chart-sources-pie', 'doughnut',
     D.sources.map(s => s.name.replace('Booking.com VCC','Booking.com').replace('Direct Booking','Direct')),
-    [{ data: D.sources.map(s => s.revenue), backgroundColor: srcColors, borderWidth: 1, borderColor: '#1a1d27' }],
+    [{ data: D.sources.map(s => s.revenue), backgroundColor: srcColors, borderWidth: 1, borderColor: '#ffffff' }],
     { legend: true, prefix: '$', doughnut: true });
 
   // ---- BY ROOM ----
@@ -368,7 +368,7 @@ function init() {
   }).join('');
 
   mkChart('chart-fixed-var', 'doughnut', ['Fixed', 'Variable'],
-    [{ data: [fixedTotal, varTotal], backgroundColor: ['rgba(239,68,68,0.7)', 'rgba(59,130,246,0.7)'], borderWidth: 1, borderColor: '#1a1d27' }],
+    [{ data: [fixedTotal, varTotal], backgroundColor: ['rgba(239,68,68,0.7)', 'rgba(59,130,246,0.7)'], borderWidth: 1, borderColor: '#ffffff' }],
     { legend: true, prefix: '$', doughnut: true });
 
   document.getElementById('fixed-per-night-empty').textContent = (fixedTotal / (365*10)).toFixed(2);
@@ -430,9 +430,9 @@ function showRoom(rnum) {
         { type: 'line', label: 'Occ %', data: r.monthly_occ.map((n,i) => Math.round(n/r.monthly_days[i]*100)), borderColor: '#22c55e', backgroundColor: 'transparent', tension: 0.3, pointRadius: 3, yAxisID: 'y1' }
       ]
     },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#8b90a8', font: { size: 11 } } } }, scales: {
-      x: { ticks: { color: '#8b90a8', font: { size: 10 } }, grid: { color: '#2e3248' } },
-      y: { ticks: { color: '#8b90a8', font: { size: 10 }, callback: v => '$'+v }, grid: { color: '#2e3248' } },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#6b7280', font: { size: 11 } } } }, scales: {
+      x: { ticks: { color: '#6b7280', font: { size: 10 } }, grid: { color: '#d1d5e0' } },
+      y: { ticks: { color: '#6b7280', font: { size: 10 }, callback: v => '$'+v }, grid: { color: '#d1d5e0' } },
       y1: { position: 'right', ticks: { color: '#22c55e', font: { size: 10 }, callback: v => v+'%' }, grid: { display: false }, min: 0, max: 100 }
     }}
   });
@@ -467,7 +467,7 @@ function mkChart(id, type, labels, datasets, opts = {}) {
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
-        legend: { display: !!opts.legend, labels: { color: '#8b90a8', font: { size: 11 }, boxWidth: 12, padding: 10 } },
+        legend: { display: !!opts.legend, labels: { color: '#6b7280', font: { size: 11 }, boxWidth: 12, padding: 10 } },
         tooltip: { callbacks: { label: ctx => {
           const v = ctx.parsed.y ?? ctx.parsed;
           if (opts.prefix) return ' ' + opts.prefix + (typeof v === 'number' ? v.toLocaleString() : v);
@@ -477,8 +477,8 @@ function mkChart(id, type, labels, datasets, opts = {}) {
       },
       cutout: opts.doughnut ? '60%' : undefined,
       scales: type === 'doughnut' ? {} : {
-        x: { ticks: { color: '#8b90a8', font: { size: 10 } }, grid: { color: '#2e3248' } },
-        y: { ticks: { color: '#8b90a8', font: { size: 10 }, callback: v => opts.prefix ? opts.prefix + v.toLocaleString() : v + (opts.suffix||'') }, grid: { color: '#2e3248' }, min: opts.yMin, max: opts.yMax }
+        x: { ticks: { color: '#6b7280', font: { size: 10 } }, grid: { color: '#d1d5e0' } },
+        y: { ticks: { color: '#6b7280', font: { size: 10 }, callback: v => opts.prefix ? opts.prefix + v.toLocaleString() : v + (opts.suffix||'') }, grid: { color: '#d1d5e0' }, min: opts.yMin, max: opts.yMax }
       }
     }
   });
